@@ -1,15 +1,25 @@
 // Author 1: borui@stanford.edu
 // Author 2: Tony
+var global_volume = 0.4;
 
 var ad_context;
 var sound_source = ["sample.mp3"];
 var buffer_list_playable;
 var switch_buffer_player;
 var switch_gain_node;
-var switch_gain_val = 0.4;
+var switch_gain_val;
 var buffer_player;
 var gain_node;
-var gain_val = 0;
+var gain_val;
+var timeouts = [];
+
+var segments = [
+  ["Section 1",40],
+  ["Section 2",80],
+  ["Section 3",90],
+  ["Section 4",120]
+];
+var switch_lock = false;
 
 $(document).ready(function(){
   create_audio_context();
@@ -33,30 +43,43 @@ function create_audio_context(){
 function buffer_loading_finished(bufferList) {
   console.log("Buffer loader compplete - loaded " + sound_source.length + " sounds");
   buffer_list_playable = bufferList;
+  build_ui();
 }
 
 // local play
 function local_play(playlist,index,start_time){
-    console.log("in 1");
-    // fadeout the previous sound node and fade in the new sound node
+    if(switch_lock){
+      console.log("Still cross fading, wait later");
+      return;
+    }
+    switch_lock = true;
+    $(".segment").css({"cursor":"no-drop"});
     gain_val = 0;
+    switch_gain_val = global_volume;
+    for (var i=0; i<timeouts.length; i++) {
+      clearTimeout(timeouts[i]);
+    }
+    console.log("cleared all timeouts");
+    // fadeout the previous sound node and fade in the new sound node
     for(var i=0; i<switch_gain_val/0.025; i++){
       // fade using 0.025 as step value
-      setTimeout(function(){
+      timeouts.push(setTimeout(function(){
         if(switch_gain_val <= 0.025){
           if(typeof switch_buffer_player !== "undefined") switch_buffer_player.stop(0);
           switch_gain_val = gain_val;
           switch_buffer_player = buffer_player;
           switch_gain_node = gain_node;
-          console.log("buffer player and gain node switched");
+          l("buffer player and gain node switched");
+          switch_lock = false;
+          $(".segment").css({"cursor":"pointer"});
           return;
         }
         switch_gain_val -= 0.025;
         gain_val += 0.025;
         if(typeof switch_gain_node !== "undefined") switch_gain_node.gain.value = switch_gain_val;
         gain_node.gain.value = gain_val;
-        console.log(switch_gain_val+" , "+gain_val);
-      },100 + 100 * i);
+        l(switch_gain_val+" , "+gain_val);
+      },100 + 100 * i));
     }
     // fadein the new sound node
     gain_node = ad_context.createGainNode();
@@ -76,6 +99,28 @@ function local_set_volume(val){
   switch_gain_val = val;
   switch_gain_node.gain.value = switch_gain_val;
 }
+
+function build_ui(){
+  $(".inner-center").empty();
+  for(var i=0; i<segments.length; i++){
+    $(".inner-center").append(
+      ' <div class="segment" id="'+i+'">'+ segments[i][0]+'</div>'
+    );
+  }
+  $(".segment").click(function(){
+    if(switch_lock){
+      return;
+    }
+    $(".segment").removeClass("sel");
+    $(this).addClass("sel");
+    local_play(buffer_list_playable,0,segments[parseInt(this.id)][1]);
+  });
+ }
+
+ function l(msg){
+  console.log(msg)
+  $("#status").html(msg);
+ }
 
 
 // buffer loader class
