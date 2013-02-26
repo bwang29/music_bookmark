@@ -33,3 +33,12 @@ body{
 .sel{
 	background: #99AABB;
 }
+
+a{
+	text-decoration: none;
+	color: #445566;
+}
+
+a:hover{
+	color: #223344;
+}

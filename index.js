@@ -90,7 +90,7 @@ function local_play(playlist,index,start_time){
     buffer_player.connect(gain_node);
     gain_node.gain.value = gain_val;
     gain_node.connect(ad_context.destination);
-    buffer_player.loop = true;
+    //buffer_player.loop = true;
     buffer_player.start(0,start_time);
 }
 
