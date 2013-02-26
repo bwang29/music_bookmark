@@ -14,10 +14,12 @@ var gain_val;
 var timeouts = [];
 
 var segments = [
-  ["Section 1",40],
-  ["Section 2",80],
-  ["Section 3",90],
-  ["Section 4",120]
+  ["Seg 1",0],
+  ["Seg 2",16],
+  ["Seg 3",47],
+  ["Seg 4",80],
+  ["Seg 5",144],
+  ["Seg 6",167]
 ];
 var switch_lock = false;
 
@@ -79,7 +81,7 @@ function local_play(playlist,index,start_time){
         if(typeof switch_gain_node !== "undefined") switch_gain_node.gain.value = switch_gain_val;
         gain_node.gain.value = gain_val;
         l(switch_gain_val+" , "+gain_val);
-      },100 + 100 * i));
+      },80 + 80 * i));
     }
     // fadein the new sound node
     gain_node = ad_context.createGainNode();
