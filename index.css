@@ -1,7 +1,6 @@
 body{
 	font-family: "Titillium Web";
 }
-
 .outer-center {
 	margin-top: 30px;
     float: right;
@@ -16,7 +15,6 @@ body{
 .clear {
     clear: both;
 }
-
 .segment{
 	display: inline-block;
 	padding: 8px 12px;
@@ -25,20 +23,60 @@ body{
 	margin: 0;
 	cursor: pointer;
 }
-
 .segment:hover{
 	background: #778899;
 }
-
 .sel{
 	background: #99AABB;
 }
-
 a{
 	text-decoration: none;
 	color: #445566;
 }
-
 a:hover{
 	color: #223344;
 }
+.hide{
+	display: none;
+}
+#dropArea {
+    background-color: #DDDDDD;
+    border: 3px dashed #000000;
+    float: left;
+    font-size: 48px;
+    font-weight: bold;
+    height: 530px;
+    line-height: 530px;
+    margin: 20px;
+    position: relative;
+    text-align: center;
+    width: 300px;
+}
+#dropArea.hover {
+    background-color: #CCCCCC;
+}
+#dropArea.uploading {
+    background: #EEEEEE;
+}
+/*Variable segments*/
+.seg_part{
+	display: inline-block;
+	cursor: pointer;
+	height: 40px;
+}
+.seg_part:hover{
+	opacity: 0.7;
+}
+.seg_bar{
+	width: 400px;
+}
+.sound_title{
+	position: absolute;
+	margin-left: -90px;
+	margin-top: 5px;
+}
+#seg_area{
+	margin: 0 auto;
+	width: 400px;
+}
+

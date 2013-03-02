@@ -25,6 +25,7 @@ var switch_lock = false;
 
 $(document).ready(function(){
   create_audio_context();
+  build_seg_bars();
 });
 
 // Support the newer Google Chrome only !
@@ -103,9 +104,9 @@ function local_set_volume(val){
 }
 
 function build_ui(){
-  $(".inner-center").empty();
+  $("#music_seg").empty();
   for(var i=0; i<segments.length; i++){
-    $(".inner-center").append(
+    $("#music_seg").append(
       ' <div class="segment" id="'+i+'">'+ segments[i][0]+'</div>'
     );
   }
@@ -117,12 +118,96 @@ function build_ui(){
     $(this).addClass("sel");
     local_play(buffer_list_playable,0,segments[parseInt(this.id)][1]);
   });
- }
+}
 
- function l(msg){
+// logging
+function l(msg){
   console.log(msg)
   $("#status").html(msg);
- }
+}
+
+function build_seg_bars(){
+  
+  for(var i=0;i<sample_seg_data.length;i++){
+    var segments = sample_seg_data[i].segments;
+    var d = sample_seg_data[i].duration;
+    var seg_bar = "<div class='seg_bar'><div class='sound_title'>Sound Title</div>";
+    var pt = 0;
+    for(var j=0; j<segments.length;j++ ){
+      seg_bar += "<div class='seg_part' style='width:"+100*((segments[j].time - pt)/d)+"%;background:"+sample_color_map[segments[j].type]+"'></div>";
+      pt = segments[j].time;
+    }
+    seg_bar += "</div>"
+    $("#seg_area").append(seg_bar);
+  }
+
+}
+
+
+// drag and drop functions for music
+$(document).ready(function(){
+  dropArea = document.getElementById('dropArea');
+  list = [];
+  totalSize = 0;
+  totalProgress = 0;
+
+  // main initialization
+  (function(){
+
+      // init handlers
+      function initHandlers() {
+          dropArea.addEventListener('drop', handleDrop, false);
+          dropArea.addEventListener('dragover', handleDragOver, false);
+      }
+
+      // drag over
+      function handleDragOver(event) {
+          event.stopPropagation();
+          event.preventDefault();
+          dropArea.className = 'hover';
+      }
+
+      // drag drop
+      function handleDrop(event) {
+          event.stopPropagation();
+          event.preventDefault();
+          processFiles(event.dataTransfer.files);
+      }
+
+      // process bunch of files
+      function processFiles(filelist) {
+          if (!filelist || !filelist.length || list.length) return;
+
+          totalSize = 0;
+          totalProgress = 0;
+
+          for (var i = 0; i < filelist.length && i < 5; i++) {
+              list.push(filelist[i]);
+              totalSize += filelist[i].size;
+          }
+
+          var reader = new FileReader();
+            reader.onload = function (event) {
+              ad_context.decodeAudioData( event.target.result, function(buffer) {
+                play_buffer(buffer);
+              }, function(){alert("error loading!");} ); 
+            };
+            reader.onerror = function (event) {
+              alert("Error: " + reader.error );
+          };
+          reader.readAsArrayBuffer(filelist[0]);
+      }
+      initHandlers();
+  })();
+});
+
+// buffer decode helper
+function play_buffer(buffer){
+    var tmp_buffer_player = ad_context.createBufferSource();
+    tmp_buffer_player.buffer = buffer;
+    tmp_buffer_player.connect(ad_context.destination);
+    tmp_buffer_player.start(0);
+}
 
 
 // buffer loader class
