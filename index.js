@@ -49,7 +49,7 @@ function buffer_loading_finished(bufferList) {
   build_ui();
 }
 
-// local play
+// local play can play any buffer in the playlist at any time and cross fade into any other time in other buffer
 function local_play(playlist,index,start_time){
     if(switch_lock){
       console.log("Still cross fading, wait later");
@@ -149,7 +149,9 @@ $(document).ready(function(){
   dropArea = document.getElementById('dropArea');
   list = [];
   totalSize = 0;
+  load_progress = 0;
   totalProgress = 0;
+  drop_buffer_list_playable = [];
 
   // main initialization
   (function(){
@@ -172,30 +174,35 @@ $(document).ready(function(){
           event.stopPropagation();
           event.preventDefault();
           processFiles(event.dataTransfer.files);
+          dropArea.className = 'uploading';
       }
 
       // process bunch of files
       function processFiles(filelist) {
           if (!filelist || !filelist.length || list.length) return;
-
           totalSize = 0;
           totalProgress = 0;
-
           for (var i = 0; i < filelist.length && i < 5; i++) {
               list.push(filelist[i]);
               totalSize += filelist[i].size;
           }
-
-          var reader = new FileReader();
-            reader.onload = function (event) {
+          var reader_list = [];
+          for(var b=0; b<filelist.length; b++){
+            reader_list[b] = new FileReader();
+            reader_list[b].onload = function (event) {
               ad_context.decodeAudioData( event.target.result, function(buffer) {
-                play_buffer(buffer);
+                console.log("Loaded buffer with length "+buffer.length);
+                drop_buffer_list_playable.push(buffer);
+                load_progress += 1;
+                if(load_progress == list.length) dropArea.className = '';
               }, function(){alert("error loading!");} ); 
             };
-            reader.onerror = function (event) {
-              alert("Error: " + reader.error );
-          };
-          reader.readAsArrayBuffer(filelist[0]);
+            reader_list[b].onerror = function (event) {
+              alert("Error: " + reader_list[b].error );
+            };
+            reader_list[b].readAsArrayBuffer(filelist[b]);
+          }
+          
       }
       initHandlers();
   })();
@@ -203,7 +210,8 @@ $(document).ready(function(){
 
 // buffer decode helper
 function play_buffer(buffer){
-    var tmp_buffer_player = ad_context.createBufferSource();
+    if(typeof tmp_buffer_player!== "undefined")tmp_buffer_player.stop(0);
+    tmp_buffer_player = ad_context.createBufferSource();
     tmp_buffer_player.buffer = buffer;
     tmp_buffer_player.connect(ad_context.destination);
     tmp_buffer_player.start(0);
