@@ -66,12 +66,14 @@ function buffer_loading_finished(bufferList) {
 
 // transit user to survey
 function go_to_survey(){
+  if(typeof switch_buffer_player !== "undefined") switch_buffer_player.stop(0);
   $("#next_step").hide();
   l("Thanks for your participation!");
   $("#music_seg").html("<div class='survey_code'><h2>Copy the code below to the <a href=''>survey</a> to obtain access to the songs</h2>"+Base64.encode(JSON.stringify(log_data))+"</div>");
 }
 // transit user to mode 2
 function go_to_mode_2(){
+  if(typeof switch_buffer_player !== "undefined") switch_buffer_player.stop(0);
   play_mode = 2;
   loading_progress = 0;
   total_song_checked = 0;
