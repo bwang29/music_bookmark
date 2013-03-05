@@ -7,7 +7,8 @@ var sound_source = [];//["sample.mp3"];
 for(var i=0; i< raw_data.length; i++){
   sound_source.push("songs/"+raw_data[i].title);
 }
-
+var loading_progress = 0;
+var loading_progress_inc = 100/sound_source.length;
 var buffer_list_playable;
 var switch_buffer_player;
 var switch_gain_node;
@@ -17,20 +18,11 @@ var gain_node;
 var gain_val;
 var timeouts = [];
 var total_song_checked = 0;
-
-var segments = [
-  ["Seg 1",0],
-  ["Seg 2",16],
-  ["Seg 3",47],
-  ["Seg 4",80],
-  ["Seg 5",144],
-  ["Seg 6",167]
-];
 var switch_lock = false;
+var play_mode = 1; // mode 1 means sgmented (bookmarked ux), otherwise there is no bookmark
 
 $(document).ready(function(){
   create_audio_context();
-  build_seg_bars();
 });
 
 // Support the newer Google Chrome only !
@@ -52,13 +44,41 @@ function buffer_loading_finished(bufferList) {
   console.log("Buffer loader compplete - loaded " + sound_source.length + " sounds");
   setTimeout(function(){
     // events after loading finished
-    msg("Welcome to the Calming Tech Music Store");
-    l("Click on the color strips to preview songs and use the check-boxes to select upto five songs that you want to purchase. Once you're done, click 'Go to the next step'.");
-    $("#next_step").show();
+    if(play_mode == 1){
+      msg("Welcome to the Calming Tech Music Store");
+      l("Click on the color strips to preview songs and use the check-boxes to select upto five songs that you want to purchase. Once you're done, click 'Go to the next step'.");
+      $("#next_step").show();
+      $("#next_step").click(function(){
+        go_to_mode_2();
+      });
+    }else{
+      l("Now select another 5 songs you want. Once you're done, click 'Go to the next step', which will lead you to our survey.");
+      $("#next_step").show().html("Go to the next step");
+      $("#next_step").unbind().click(function(){
+        go_to_survey();
+      });
+    }
 
   },500);
   buffer_list_playable = bufferList;
   build_ui();
+}
+
+// transit user to survey
+function go_to_survey(){
+  $("#next_step").hide();
+  l("Thanks for your participation!");
+  $("#music_seg").html("<div class='survey_code'><h2>Copy the code below to the <a href=''>survey</a> to obtain access to the songs</h2>"+Base64.encode(JSON.stringify(log_data))+"</div>");
+}
+// transit user to mode 2
+function go_to_mode_2(){
+  play_mode = 2;
+  loading_progress = 0;
+  total_song_checked = 0;
+  $("#music_seg").empty();
+  $("#next_step").hide();
+  l("Loading...")
+  create_audio_context();
 }
 
 // show message to user
@@ -108,7 +128,7 @@ function local_play(playlist,index,start_time){
     buffer_player.connect(gain_node);
     gain_node.gain.value = gain_val;
     gain_node.connect(ad_context.destination);
-    //buffer_player.loop = true;
+    //buffer_player.loop = true; // enable this if you want the music to loop
     buffer_player.start(0,start_time);
 }
 
@@ -129,15 +149,20 @@ function build_ui(){
     var seg_html = "<div class='seg_bar'><div class='sound_title hide'>"+raw_data[s].title.split(".")[0]+"</div>";
     var pt = 0; // start time of a segment
     var c_p = 0; // type of a segment
-    for(var i=0; i<segs.length; i++){
-      var c_t = time_to_sec(segs[i].split("_")[0])+1; // end time of a segment
-      if(i != 0){
-        c_p = segs[i-1].split("_")[1];
+    // mode 1 is segmented
+    if(play_mode == 1){
+      for(var i=0; i<segs.length; i++){
+        var c_t = time_to_sec(segs[i].split("_")[0])+1; // end time of a segment
+        if(i != 0){
+          c_p = segs[i-1].split("_")[1];
+        }
+        seg_html += "<div class='seg_part' id='"+s+"_"+pt+"' style='width:"+100*((c_t - pt)/d)+"%;background:"+sample_color_map[c_p]+"'></div>";
+        pt = c_t;
       }
-      seg_html += "<div class='seg_part' id='"+s+"_"+pt+"' style='width:"+100*((c_t - pt)/d)+"%;background:"+sample_color_map[c_p]+"'></div>";
-      pt = c_t;
+      seg_html += "<div class='seg_part' id='"+s+"_"+pt+"' style='width:"+100*((d - pt)/d)+"%;background:"+sample_color_map[segs[segs.length-1].split("_")[1]]+"'></div>";
+    }else{
+      seg_html += "<div class='seg_part' id='"+s+"_"+pt+"' style='width:100%;background:#999'></div>";
     }
-    seg_html += "<div class='seg_part' id='"+s+"_"+pt+"' style='width:"+100*((d - pt)/d)+"%;background:"+sample_color_map[segs[segs.length-1].split("_")[1]]+"'></div>";
     // append checkboxes
     seg_html += '<input type="checkbox" class="ckbox" id="c_'+s+'" value="'+raw_data[s].title.split(".")[0]+'"><br>';
     seg_html += "</div>";
@@ -177,7 +202,8 @@ function log_gen(act,d){
   log_data.push({
     time:new Date(),
     action:act,
-    data:d
+    data:d,
+    mode:play_mode
   });
 }
 
@@ -270,9 +296,6 @@ $(document).ready(function(){
   })();
 });
 
-// loading and loading percentage
-var loading_progress = 0;
-var loading_progress_inc = 100/sound_source.length;
 // buffer loader class
 function BufferLoader(context,urlList,callback){this.context=context;this.urlList=urlList;this.onload=callback;this.bufferList=new Array();this.loadCount=0;}
 BufferLoader.prototype.loadBuffer=function(url,index){var request=new XMLHttpRequest();request.open("GET",url,true);request.responseType="arraybuffer";var loader=this;request.onload=function(){loader.context.decodeAudioData(request.response,function(buffer){if(!buffer){alert('error decoding file data: '+url);return;}

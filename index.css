@@ -77,6 +77,11 @@ a:hover{
 .button:hover{
 	opacity: 0.9;
 }
+.survey_code{
+	width: 500px;
+	word-wrap: break-word;
+
+}
 input[type=checkbox]{
   /* Double-sized Checkboxes */
   -ms-transform: scale(2); /* IE */
