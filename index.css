@@ -98,9 +98,12 @@ input[type=checkbox]{
 }
 .seg_part:hover{
 	opacity: 0.7;
+	background-image: url('resources/play_btn.png');
+	background-repeat: no-repeat;
+	background-size: 40px 40px;
 }
 .seg_bar{
-	width: 400px;
+	width: 450px;
 }
 .sound_title{
 	position: absolute;
@@ -115,7 +118,7 @@ input[type=checkbox]{
 }
 #seg_area{
 	margin: 0 auto;
-	width: 400px;
+	width: 450px;
 }
 .sel{
 	opacity: 0.3;
