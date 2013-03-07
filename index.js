@@ -85,8 +85,8 @@ function enter_mode(mode){
       pause_previous_html_audio();
       $("#next_step").hide();
       l("Thanks for your participation!");
-      $("#music_seg").html("<div class='survey_code'><h2 style='margin-top:0'>Copy the code below to the <a href='https://docs.google.com/forms/d/1ULt-fNqC37AtlaS_-d5_Opqp1cppuy5MCvYuqMjfFMM/viewform'>survey</a> to obtain access to the songs</h2>"+Base64.encode(JSON.stringify(log_data))+"</div>");
-  }
+      $("#music_seg").html("<div class='survey_code'><h2 style='margin-top:0'>Please copy the code below into the survey.</h2><div id='data_code' style='border:2px solid; width:746px; padding:5px; margin:-10px 0 30px 0; background-color:#C0C0C0;'>"+Base64.encode(JSON.stringify(log_data))+"</div></div><h2>Survey:</h2><div><iframe src=\"https://docs.google.com/forms/d/1ULt-fNqC37AtlaS_-d5_Opqp1cppuy5MCvYuqMjfFMM/viewform?embedded=true\" width=\"760\" height=\"693\" frameborder=\"0\" marginheight=\"0\" marginwidth=\"0\">Loading...</iframe></div>");
+    }
 }
 
 // build bookmark ui
