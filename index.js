@@ -23,6 +23,12 @@ var time_ended;
 
 // Support the newer Google Chrome only !
 function fire_up(){
+    var isChrome = (navigator.userAgent.indexOf('Chrome') != -1 && parseFloat(navigator.userAgent.substring(navigator.userAgent.indexOf('Chrome') + 7).split(' ')[0]) >= 15);
+    if(!isChrome) {
+      window.alert("Please use the latest version of Chrome. We don't support other browsers at the moment, sorry!");
+      return;
+    }
+
     console.log("Audio context initiated");
     for(var i=0; i<sound_source.length;i++){
       var audio = new Audio();
