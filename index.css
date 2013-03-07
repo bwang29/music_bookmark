@@ -2,6 +2,9 @@ body{
 	font-family: "Titillium Web";
 	margin:0;
 }
+h2{
+	font-size: 36px;
+}
 .outer-center {
 	margin-top: 30px;
     float: right;
@@ -62,7 +65,7 @@ a:hover{
 	height: 100%;
 	position: fixed;
 	color: #fafafa;
-	font-size: 20px;
+	font-size: 18px;
 	padding: 25px 100px 25px 100px;
 	z-index: 999;
 }
@@ -106,9 +109,7 @@ input[type=checkbox]{
 	width: 450px;
 }
 .sound_title{
-	position: absolute;
-	margin-left: -250px;
-	margin-top: 5px;
+	
 }
 .ckbox{
 	position: absolute;

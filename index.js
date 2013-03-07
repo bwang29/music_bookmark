@@ -17,15 +17,6 @@ $(document).ready(function(){
   fire_up();
 });
 
-function force_load(sound){
-  setTimeout(function(){
-    sound.play();
-    setTimeout(function(){
-      sound.pause();
-    },10);
-  },300);
-}
-
 // Support the newer Google Chrome only !
 function fire_up(){
     console.log("Audio context initiated");
@@ -37,7 +28,7 @@ function fire_up(){
       audio.preload = "none";
       var audio_wrapper = document.createElement("div");
       audio_wrapper.setAttribute("class","audio_wrapper");
-      audio_wrapper.setAttribute("style","width: 350px; margin: 0 auto;")
+      audio_wrapper.setAttribute("style","display:none; width: 350px; margin: 0 auto;")
       audio_wrapper.appendChild(audio);
       document.body.appendChild(audio_wrapper); 
       html5_audios_playable.push(audio);
@@ -57,6 +48,8 @@ function enter_mode(mode){
       l("Click on the color segments to preview parts of songs. Please use the check-boxes to select up to five songs that you want to purchase. Once you're done, click 'Go to the next step'.");
       $("#next_step").show();
       build_ui();
+      $(".mode1").show();
+      $(".mode2").hide();
       $("#next_step").unbind().click(function(){
         if(first_mode == 1){
           enter_mode(2);
@@ -73,6 +66,8 @@ function enter_mode(mode){
       l("Click on each strip to preview that song. Please select up to 5 songs using the check-boxes you want to purchase. Once you're done, click 'Go to the next step'.");
       $("#next_step").show().html("Go to the next step");
       build_ui();
+      $(".mode2").show();
+      $(".mode1").hide();
       $("#next_step").unbind().click(function(){
         if(first_mode == 1){
           enter_mode(3);
@@ -85,7 +80,7 @@ function enter_mode(mode){
       pause_previous_html_audio();
       $("#next_step").hide();
       l("Thanks for your participation!");
-      $("#music_seg").html("<div class='survey_code'><h2 style='margin-top:0'>Please copy the code below into the survey.</h2><div id='data_code' style='border:2px solid; width:746px; padding:5px; margin:-10px 0 30px 0; background-color:#C0C0C0;'>"+Base64.encode(JSON.stringify(log_data))+"</div></div><h2>Survey:</h2><div><iframe src=\"https://docs.google.com/forms/d/1ULt-fNqC37AtlaS_-d5_Opqp1cppuy5MCvYuqMjfFMM/viewform?embedded=true\" width=\"760\" height=\"693\" frameborder=\"0\" marginheight=\"0\" marginwidth=\"0\">Loading...</iframe></div>");
+      $("#music_seg").html("<div class='survey_code'><h2 style='margin-top:0'>Please copy the code below into the survey.</h2><div id='data_code' style='border:2px dashed; width:746px; padding:5px; margin:-10px 0 30px 0; background-color:#f0f0f0;'>"+Base64.encode(JSON.stringify(log_data))+"</div></div><h2>Survey:</h2><div><iframe src=\"https://docs.google.com/forms/d/1ULt-fNqC37AtlaS_-d5_Opqp1cppuy5MCvYuqMjfFMM/viewform?embedded=true\" width=\"760\" height=\"693\" frameborder=\"0\" marginheight=\"0\" marginwidth=\"0\">Loading...</iframe></div>");
     }
 }
 
@@ -93,9 +88,16 @@ function enter_mode(mode){
 function build_ui(){
   $("#music_seg").empty();
   for(var s=0; s<raw_data.length;s++){
+    var sid = raw_data[s].id;
     var segs = raw_data[s].segment.split(" ");
     var d = time_to_sec(raw_data[s].duration);
-    var seg_html = "<div class='seg_bar'><div class='sound_title '>"+raw_data[s].title.split(".")[0]+"</div>";
+
+    if(s < raw_data.length/2){
+      var seg_html = "<div class='seg_bar mode1'><div class='sound_title'>"+raw_data[s].title.split(".mp3")[0]+"</div>";
+    }else{
+      var seg_html = "<div class='seg_bar mode2'><div class='sound_title'>"+raw_data[s].title.split(".mp3")[0]+"</div>";
+    }
+   
     var pt = 0; // start time of a segment
     var c_p = 0; // type of a segment
     // mode 1 is segmented
@@ -113,7 +115,7 @@ function build_ui(){
       seg_html += "<div class='seg_part' id='"+s+"_"+pt+"' style='width:100%;background-color:#999'></div>";
     }
     // append checkboxes
-    seg_html += '<input type="checkbox" class="ckbox" id="c_'+s+'" value="'+raw_data[s].title.split(".")[0]+'"><br>';
+    seg_html += '<input type="checkbox" class="ckbox" id="c_'+sid+'" value="'+raw_data[s].title.split(".")[0]+'"><br>';
     seg_html += "</div>";
     $("#music_seg").append(seg_html);
   }
@@ -147,6 +149,7 @@ function build_ui(){
       html5_audios_load[html5_current_idx] = true;
     }  
     setTimeout(function(){
+      console.log(id_info);
       html5_audios_playable[html5_current_idx].currentTime = parseInt(id_info[1]);
       html5_audios_playable[html5_current_idx].play();
     },300);
