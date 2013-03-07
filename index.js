@@ -9,6 +9,7 @@ var loading_progress_inc = 100/sound_source.length;
 var html5_audios_playable = [];
 var html5_audios_load = {};
 var html5_current_idx = 0;
+var html5_current_segment_id = "";
 var total_song_checked = 0;
 var switch_lock = false;
 var play_mode = parseInt(getQueryParams(document.location.search).mode); // mode 1 means sgmented (bookmarked ux), 2 there is no bookmark
@@ -130,8 +131,9 @@ function build_ui(){
     seg_html += "</div>";
     $("#music_seg").append(seg_html);
   }
+  $("#music_seg").append("<div class='choose_5'>Choose 5 songs</div>");
   // attach check box event
-  $(".ckbox").click(function(){
+  $(".ckbox").unbind().click(function(){
     if($(this).is(":checked")){
       if(total_song_checked == 5){
         alert("You can check at most 5 songs!");
@@ -146,13 +148,19 @@ function build_ui(){
     }
   });
   // play music buffer when click
-  $(".seg_part").click(function(){
+  $(".seg_part").unbind().click(function(){
     if(switch_lock){
+      return;
+    }
+    var id_info = this.id.split("_");
+    if(html5_current_segment_id == this.id){
+      pause_previous_html_audio();
+      $(".seg_part").removeClass("sel");
       return;
     }
     $(".seg_part").removeClass("sel");
     $(this).addClass("sel");
-    var id_info = this.id.split("_");
+    html5_current_segment_id = this.id;
     pause_previous_html_audio();
     html5_current_idx = parseInt(id_info[0]);
     if(typeof html5_audios_load[html5_current_idx] === "undefined"){
@@ -165,6 +173,7 @@ function build_ui(){
       html5_audios_playable[html5_current_idx].play();
     },300);
   });
+
 }
 
 // t: time, a: action, d: data, m: play mode

@@ -77,6 +77,11 @@ a:hover{
 	opacity: 0.7;
 	cursor: pointer;
 }
+.choose_5{
+	top: -20px;
+	right: -70px;
+	position: absolute;
+}
 .button:hover{
 	opacity: 0.9;
 }
@@ -109,7 +114,11 @@ input[type=checkbox]{
 	width: 450px;
 }
 .sound_title{
-	
+	margin-top:6px;
+	line-height: 18px;
+	margin-bottom: 2px;
+	color: #333;
+	font-size: 14px;
 }
 .ckbox{
 	position: absolute;
@@ -122,9 +131,12 @@ input[type=checkbox]{
 	width: 450px;
 }
 .sel{
-	opacity: 0.3;
-	background-image: url('resources/play_btn.png');
+	opacity: 0.5;
+	background-image: url('resources/pause_btn.png');
 	background-repeat: no-repeat;
 	background-size: 40px 40px;
+}
+.sel:hover{
+	background-image: url('resources/pause_btn.png');
 }
 
