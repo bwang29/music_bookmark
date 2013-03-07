@@ -85,7 +85,7 @@ function enter_mode(mode){
         }
       });
   }else if(play_mode == 3){
-      // Record total time spent
+      // Record total time spent, tt: total time
       time_ended = new Date().getTime();
       log_data.push({tt:time_ended - time_started});
 
@@ -161,6 +161,7 @@ function build_ui(){
   });
 }
 
+// t: time, a: action, d: data, m: play mode
 function log_gen(act,d){
   log_data.push({
     t:new Date(),
