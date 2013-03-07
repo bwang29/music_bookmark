@@ -43,8 +43,8 @@ function enter_mode(mode){
       pause_previous_html_audio();
       loading_progress = 0;
       total_song_checked = 0;
-      msg("Welcome to the Calming Tech Music Store");
-      l("Click on the color strips to preview songs and use the check-boxes to select upto five songs that you want to purchase. Once you're done, click 'Go to the next step'.");
+      msg("Welcome to the Calming Tech Music Store!");
+      l("Click on the color segments to preview parts of songs. Please use the check-boxes to select up to five songs that you want to purchase. Once you're done, click 'Go to the next step'.");
       $("#next_step").show();
       build_ui();
       $("#next_step").unbind().click(function(){
@@ -56,7 +56,7 @@ function enter_mode(mode){
       loading_progress = 0;
       total_song_checked = 0;
       msg("Welcome to the Calming Tech Music Store");
-      l("Now select another 5 songs using the check-boxes you want to purchase. Once you're done, click 'Go to the next step'.");
+      l("Click on each strip to preview that song. Please select up to 5 songs using the check-boxes you want to purchase. Once you're done, click 'Go to the next step'.");
       $("#next_step").show().html("Go to the next step");
       build_ui();
       $("#next_step").unbind().click(function(){
@@ -67,7 +67,7 @@ function enter_mode(mode){
       pause_previous_html_audio();
       $("#next_step").hide();
       l("Thanks for your participation!");
-      $("#music_seg").html("<div class='survey_code'><h2 style='margin-top:0'>Copy the code below to the <a href=''>survey</a> to obtain access to the songs</h2>"+Base64.encode(JSON.stringify(log_data))+"</div>");
+      $("#music_seg").html("<div class='survey_code'><h2 style='margin-top:0'>Copy the code below to the <a href='https://docs.google.com/forms/d/1ULt-fNqC37AtlaS_-d5_Opqp1cppuy5MCvYuqMjfFMM/viewform'>survey</a> to obtain access to the songs</h2>"+Base64.encode(JSON.stringify(log_data))+"</div>");
   }
 }
 
