@@ -11,8 +11,8 @@ var html5_audios_load = {};
 var html5_current_idx = 0;
 var total_song_checked = 0;
 var switch_lock = false;
-var play_mode = 1; // mode 1 means sgmented (bookmarked ux), 2 there is no bookmark, 3 survey page
-var first_mode = 1;
+var play_mode = parseInt(getQueryParams(document.location.search).mode); // mode 1 means sgmented (bookmarked ux), 2 there is no bookmark
+var first_mode = play_mode;
 $(document).ready(function(){
   fire_up();
 });
@@ -42,7 +42,7 @@ function fire_up(){
       document.body.appendChild(audio_wrapper); 
       html5_audios_playable.push(audio);
     }
-    enter_mode(1);
+    enter_mode(first_mode);
 }
 
 // enter a particular mode of our app
@@ -61,7 +61,7 @@ function enter_mode(mode){
         if(first_mode == 1){
           enter_mode(2);
         }else{
-          enter_mode(1);
+          enter_mode(3);
         }
       });
   }else if(play_mode == 2){
@@ -74,7 +74,11 @@ function enter_mode(mode){
       $("#next_step").show().html("Go to the next step");
       build_ui();
       $("#next_step").unbind().click(function(){
-        enter_mode(3);
+        if(first_mode == 1){
+          enter_mode(3);
+        }else{
+          enter_mode(1);
+        }
       });
   }else if(play_mode == 3){
       if(typeof switch_buffer_player !== "undefined") switch_buffer_player.stop(0);
@@ -91,7 +95,7 @@ function build_ui(){
   for(var s=0; s<raw_data.length;s++){
     var segs = raw_data[s].segment.split(" ");
     var d = time_to_sec(raw_data[s].duration);
-    var seg_html = "<div class='seg_bar'><div class='sound_title hide'>"+raw_data[s].title.split(".")[0]+"</div>";
+    var seg_html = "<div class='seg_bar'><div class='sound_title '>"+raw_data[s].title.split(".")[0]+"</div>";
     var pt = 0; // start time of a segment
     var c_p = 0; // type of a segment
     // mode 1 is segmented
@@ -165,3 +169,14 @@ function pause_previous_html_audio(){html5_audios_playable[html5_current_idx].pa
 function l(msg){console.log(msg); $("#status").html(msg); }
 // transform 4:30 to 4*60 + 30
 function time_to_sec(t){var t_s = t.split(":"); return t_s[0]*60 + parseInt(t_s[1]); }
+// query js parameters 
+function getQueryParams(qs) {
+    qs = qs.split("+").join(" ");
+    var params = {}, tokens,
+        re = /[?&]?([^=]+)=([^&]*)/g;
+    while (tokens = re.exec(qs)) {
+        params[decodeURIComponent(tokens[1])]
+            = decodeURIComponent(tokens[2]);
+    }
+    return params;
+}
