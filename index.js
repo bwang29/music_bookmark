@@ -24,6 +24,12 @@ var time_ended;
 
 // Support the newer Google Chrome only !
 function fire_up(){
+    var isChrome = (navigator.userAgent.indexOf('Chrome') != -1 && parseFloat(navigator.userAgent.substring(navigator.userAgent.indexOf('Chrome') + 7).split(' ')[0]) >= 15);
+    if(!isChrome) {
+      window.alert("Please use the latest version of Chrome. We don't support other browsers at the moment, sorry!");
+      return;
+    }
+
     console.log("Audio context initiated");
     for(var i=0; i<sound_source.length;i++){
       var audio = new Audio();
@@ -141,10 +147,12 @@ function build_ui(){
         return;
       }
       total_song_checked += 1;
-      log_gen("s",this.id,$(this).attr("value"));
+      // Log song checked. c: song checked
+      log_gen("c",this.id);
     }else{
+      // Log song unselected. uc: song unchecked
       total_song_checked -= 1;
-      log_gen("us",this.id,$(this).attr("value"));
+      log_gen("uc",this.id);
     }
   });
   // play music buffer when click
@@ -167,6 +175,10 @@ function build_ui(){
       html5_audios_playable[html5_current_idx].load();
       html5_audios_load[html5_current_idx] = true;
     }  
+
+    // log section play data, sp: section played, d: song id & section beginning in seconds
+    log_gen("sp", raw_data[html5_current_idx].id + "_" + id_info[1]);
+
     setTimeout(function(){
       console.log(id_info);
       html5_audios_playable[html5_current_idx].currentTime = parseInt(id_info[1]);
