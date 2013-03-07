@@ -2,19 +2,29 @@
 // Author 2: Tony
 var sound_source = [];//["sample.mp3"];
 for(var i=0; i< raw_data.length; i++){
-  sound_source.push("songs/"+raw_data[i].title);
+  sound_source.push("https://s3.amazonaws.com/tourfy_mount_001/songs/"+raw_data[i].title);
 }
 var loading_progress = 0;
 var loading_progress_inc = 100/sound_source.length;
 var html5_audios_playable = [];
-// var html5_audios_load = {};
+var html5_audios_load = {};
 var html5_current_idx = 0;
 var total_song_checked = 0;
 var switch_lock = false;
 var play_mode = 1; // mode 1 means sgmented (bookmarked ux), 2 there is no bookmark, 3 survey page
+var first_mode = 1;
 $(document).ready(function(){
   fire_up();
 });
+
+function force_load(sound){
+  setTimeout(function(){
+    sound.play();
+    setTimeout(function(){
+      sound.pause();
+    },10);
+  },300);
+}
 
 // Support the newer Google Chrome only !
 function fire_up(){
@@ -24,10 +34,10 @@ function fire_up(){
       audio.src = sound_source[i];
       audio.controls = true;
       audio.autoplay = false;
-      audio.preload = "auto";
+      audio.preload = "none";
       var audio_wrapper = document.createElement("div");
       audio_wrapper.setAttribute("class","audio_wrapper");
-      audio_wrapper.setAttribute("style","display:none;width: 350px; margin: 0 auto;")
+      audio_wrapper.setAttribute("style","width: 350px; margin: 0 auto;")
       audio_wrapper.appendChild(audio);
       document.body.appendChild(audio_wrapper); 
       html5_audios_playable.push(audio);
@@ -48,7 +58,11 @@ function enter_mode(mode){
       $("#next_step").show();
       build_ui();
       $("#next_step").unbind().click(function(){
-        enter_mode(2);
+        if(first_mode == 1){
+          enter_mode(2);
+        }else{
+          enter_mode(1);
+        }
       });
   }else if(play_mode == 2){
       if(typeof switch_buffer_player !== "undefined") switch_buffer_player.stop(0);
@@ -124,15 +138,14 @@ function build_ui(){
     var id_info = this.id.split("_");
     pause_previous_html_audio();
     html5_current_idx = parseInt(id_info[0]);
-    // if(typeof html5_audios_load[html5_current_idx] === "undefined"){
-    //   html5_audios_playable[html5_current_idx].load();
-    //   html5_audios_load[html5_current_idx] = true;
-    // }  
-    // setTimeout(function(){
+    if(typeof html5_audios_load[html5_current_idx] === "undefined"){
+      html5_audios_playable[html5_current_idx].load();
+      html5_audios_load[html5_current_idx] = true;
+    }  
+    setTimeout(function(){
       html5_audios_playable[html5_current_idx].currentTime = parseInt(id_info[1]);
       html5_audios_playable[html5_current_idx].play();
-    // },300);
-    
+    },300);
   });
 }
 
