@@ -62,8 +62,8 @@ a:hover{
 	height: 100%;
 	position: fixed;
 	color: #fafafa;
-	font-size: 18px;
-	padding: 100px;
+	font-size: 20px;
+	padding: 25px 100px 25px 100px;
 	z-index: 999;
 }
 .button{
