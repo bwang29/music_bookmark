@@ -7,6 +7,7 @@ for(var i=0; i< raw_data.length; i++){
 var loading_progress = 0;
 var loading_progress_inc = 100/sound_source.length;
 var html5_audios_playable = [];
+// var html5_audios_load = {};
 var html5_current_idx = 0;
 var total_song_checked = 0;
 var switch_lock = false;
@@ -26,7 +27,7 @@ function fire_up(){
       audio.preload = "auto";
       var audio_wrapper = document.createElement("div");
       audio_wrapper.setAttribute("class","audio_wrapper");
-      audio_wrapper.setAttribute("style","display:none; width: 350px; margin: 0 auto;")
+      audio_wrapper.setAttribute("style","display:none;width: 350px; margin: 0 auto;")
       audio_wrapper.appendChild(audio);
       document.body.appendChild(audio_wrapper); 
       html5_audios_playable.push(audio);
@@ -123,8 +124,15 @@ function build_ui(){
     var id_info = this.id.split("_");
     pause_previous_html_audio();
     html5_current_idx = parseInt(id_info[0]);
-    html5_audios_playable[html5_current_idx].currentTime = parseInt(id_info[1]);
-    html5_audios_playable[html5_current_idx].play();
+    // if(typeof html5_audios_load[html5_current_idx] === "undefined"){
+    //   html5_audios_playable[html5_current_idx].load();
+    //   html5_audios_load[html5_current_idx] = true;
+    // }  
+    // setTimeout(function(){
+      html5_audios_playable[html5_current_idx].currentTime = parseInt(id_info[1]);
+      html5_audios_playable[html5_current_idx].play();
+    // },300);
+    
   });
 }
 
