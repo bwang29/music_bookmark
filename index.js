@@ -97,7 +97,7 @@ function enter_mode(mode){
       $("#next_step").hide();
       l("Thanks for your participation!");
 
-      $("#music_seg").html("<div class='survey_code'><h2 style='margin-top:0'>Please copy the code below into the survey.</h2><div id='data_code' style='border:1px dashed; width:746px; padding:5px; margin:-10px 0 30px 0; background-color:#fafafa; font-size:75%; line-height:1;'>"+Base64.encode(JSON.stringify(log_data))+"</div></div><h2>Survey:</h2><div><iframe src=\"https://docs.google.com/forms/d/1ULt-fNqC37AtlaS_-d5_Opqp1cppuy5MCvYuqMjfFMM/viewform?embedded=true\" width=\"760\" height=\"864\" frameborder=\"0\" marginheight=\"0\" marginwidth=\"0\">Loading...</iframe></div>");
+      $("#music_seg").html("<div class='survey_code'><h2 style='margin-top:0'>Please copy the code below into the survey.</h2><div id='data_code' style='border:1px dashed; width:746px; padding:5px; margin:-10px 0 30px 0; background-color:#fafafa; font-size:75%; line-height:1;'>"+Base64.encode(JSON.stringify(log_data))+"</div></div><h2>Survey:</h2><div><iframe src=\"https://docs.google.com/forms/d/1ULt-fNqC37AtlaS_-d5_Opqp1cppuy5MCvYuqMjfFMM/viewform?embedded=true\" width=\"760\" height=\"1258\" frameborder=\"0\" marginheight=\"0\" marginwidth=\"0\">Loading...</iframe></div>");
 
     }
 }
