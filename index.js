@@ -17,6 +17,9 @@ $(document).ready(function(){
   fire_up();
 });
 
+var time_started;
+var time_ended;
+
 function force_load(sound){
   setTimeout(function(){
     sound.play();
@@ -43,6 +46,7 @@ function fire_up(){
       html5_audios_playable.push(audio);
     }
     enter_mode(first_mode);
+    time_started = new Date().getTime();
 }
 
 // enter a particular mode of our app
@@ -81,11 +85,15 @@ function enter_mode(mode){
         }
       });
   }else if(play_mode == 3){
+      // Record total time spent
+      time_ended = new Date().getTime();
+      log_data.push({tt:time_ended - time_started});
+
       if(typeof switch_buffer_player !== "undefined") switch_buffer_player.stop(0);
       pause_previous_html_audio();
       $("#next_step").hide();
       l("Thanks for your participation!");
-      $("#music_seg").html("<div class='survey_code'><h2 style='margin-top:0'>Please copy the code below into the survey.</h2><div id='data_code' style='border:2px solid; width:746px; padding:5px; margin:-10px 0 30px 0; background-color:#C0C0C0;'>"+Base64.encode(JSON.stringify(log_data))+"</div></div><h2>Survey:</h2><div><iframe src=\"https://docs.google.com/forms/d/1ULt-fNqC37AtlaS_-d5_Opqp1cppuy5MCvYuqMjfFMM/viewform?embedded=true\" width=\"760\" height=\"693\" frameborder=\"0\" marginheight=\"0\" marginwidth=\"0\">Loading...</iframe></div>");
+      $("#music_seg").html("<div class='survey_code'><h2 style='margin-top:0'>Please copy the code below into the survey.</h2><div id='data_code' style='border:2px solid; width:746px; padding:5px; margin:-10px 0 30px 0; background-color:#C0C0C0; font-size:75%; line-height:1;'>"+Base64.encode(JSON.stringify(log_data))+"</div></div><h2>Survey:</h2><div><iframe src=\"https://docs.google.com/forms/d/1ULt-fNqC37AtlaS_-d5_Opqp1cppuy5MCvYuqMjfFMM/viewform?embedded=true\" width=\"760\" height=\"864\" frameborder=\"0\" marginheight=\"0\" marginwidth=\"0\">Loading...</iframe></div>");
     }
 }
 
@@ -126,10 +134,10 @@ function build_ui(){
         return;
       }
       total_song_checked += 1;
-      log_gen("checkbox select",this.id,$(this).attr("value"));
+      log_gen("s",this.id,$(this).attr("value"));
     }else{
       total_song_checked -= 1;
-      log_gen("checkbox unselect",this.id,$(this).attr("value"));
+      log_gen("us",this.id,$(this).attr("value"));
     }
   });
   // play music buffer when click
@@ -155,10 +163,10 @@ function build_ui(){
 
 function log_gen(act,d){
   log_data.push({
-    time:new Date(),
-    action:act,
-    data:d,
-    mode:play_mode
+    t:new Date(),
+    a:act,
+    d:d,
+    m:play_mode
   });
 }
 // show message to user
