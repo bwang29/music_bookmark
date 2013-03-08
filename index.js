@@ -17,7 +17,7 @@ var first_mode = play_mode;
 $(document).ready(function(){
   fire_up();
 });
-
+var seg_indicator_timeout;
 var time_started;
 var time_ended;
 
@@ -111,9 +111,9 @@ function build_ui(){
     var d = time_to_sec(raw_data[s].duration);
 
     if(s < raw_data.length/2){
-      var seg_html = "<div class='seg_bar mode1'><div class='sound_title'>"+raw_data[s].title.split(".mp3")[0]+"</div>";
+      var seg_html = "<div class='seg_bar mode1'><div class='sound_title'>"+raw_data[s].title.split(".mp3")[0]+"</div><div class='seg_indicator' id='ind_"+sid+"'></div>";
     }else{
-      var seg_html = "<div class='seg_bar mode2'><div class='sound_title'>"+raw_data[s].title.split(".mp3")[0]+"</div>";
+      var seg_html = "<div class='seg_bar mode2'><div class='sound_title'>"+raw_data[s].title.split(".mp3")[0]+"</div><div class='seg_indicator' id='ind_"+sid+"'></div>";
     }
    
     var pt = 0; // start time of a segment
@@ -164,6 +164,7 @@ function build_ui(){
     if(html5_current_segment_id == this.id){
       pause_previous_html_audio();
       $(".seg_part").removeClass("sel");
+      html5_current_segment_id = "";
       return;
     }
     $(".seg_part").removeClass("sel");
@@ -183,6 +184,11 @@ function build_ui(){
       console.log(id_info);
       html5_audios_playable[html5_current_idx].currentTime = parseInt(id_info[1]);
       html5_audios_playable[html5_current_idx].play();
+      clearInterval(seg_indicator_timeout);
+      seg_indicator_timeout = setInterval(function(){
+        var seg_left = 450*(html5_audios_playable[html5_current_idx].currentTime/time_to_sec(raw_data[html5_current_idx].duration));
+        $("#ind_"+raw_data[html5_current_idx].id).css("left",seg_left+"px");
+      },1000);
     },300);
   });
 

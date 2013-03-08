@@ -139,4 +139,10 @@ input[type=checkbox]{
 .sel:hover{
 	background-image: url('resources/pause_btn.png');
 }
+.seg_indicator{
+	position: absolute;
+	height: 40px;
+	width: 3px;
+	background: #CC0000;
+}
 
