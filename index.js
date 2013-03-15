@@ -187,8 +187,8 @@ function build_ui(){
       clearInterval(seg_indicator_timeout);
       seg_indicator_timeout = setInterval(function(){
         var seg_left = 450*(html5_audios_playable[html5_current_idx].currentTime/time_to_sec(raw_data[html5_current_idx].duration));
-        $("#ind_"+raw_data[html5_current_idx].id).css("left",seg_left+"px");
-      },1000);
+        $("#ind_"+raw_data[html5_current_idx].id).css("left",seg_left+"px"-3);
+      },500);
     },300);
   });
 
