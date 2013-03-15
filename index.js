@@ -111,9 +111,9 @@ function build_ui(){
     var d = time_to_sec(raw_data[s].duration);
 
     if(s < raw_data.length/2){
-      var seg_html = "<div class='seg_bar mode1'><div class='sound_title'>"+raw_data[s].title.split(".mp3")[0]+"</div><div class='seg_indicator' id='ind_"+sid+"'></div>";
+      var seg_html = "<div class='seg_bar mode1'><div class='sound_title'>"+raw_data[s].title.split(".mp3")[0]+"</div><div class='seg_indicator' id='ind_"+sid+"'><div class='seg_indicator_gray' id='gray_ind_"+sid+"'></div>";
     }else{
-      var seg_html = "<div class='seg_bar mode2'><div class='sound_title'>"+raw_data[s].title.split(".mp3")[0]+"</div><div class='seg_indicator' id='ind_"+sid+"'></div>";
+      var seg_html = "<div class='seg_bar mode2'><div class='sound_title'>"+raw_data[s].title.split(".mp3")[0]+"</div><div class='seg_indicator' id='ind_"+sid+"'></div><div class='seg_indicator_gray' id='gray_ind_"+sid+"'></div>";
     }
    
     var pt = 0; // start time of a segment
@@ -191,6 +191,29 @@ function build_ui(){
       },500);
     },300);
   });
+
+  // shift segment indicator when hovering over gray segments in play_mode 2
+  if(play_mode == 2) {
+    $(".seg_part").unbind().mouseover(function(e) {
+      var id_info = this.id.split("_");
+      html5_current_segment_id = this.id;
+      html5_current_idx = parseInt(id_info[0]);
+      var left_edge = $("#" + this.id).offset().left;
+      var right_edge = $("#" + this.id).offset().right;
+      var width = right_edge - left_edge;
+      var current;
+
+      $(".seg_part").mousemove(function(e){
+        current = e.pageX - left_edge;
+        $("#gray_ind_"+raw_data[html5_current_idx].id).css("display", "inline");
+        $("#gray_ind_"+raw_data[html5_current_idx].id).css("left", current);
+      });
+
+      $(".seg_part").mouseout(function(e){
+        $("#gray_ind_"+raw_data[html5_current_idx].id).css("display", "none");
+      });
+    });
+  }
 
 }
 
