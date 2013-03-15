@@ -187,7 +187,8 @@ function build_ui(){
       clearInterval(seg_indicator_timeout);
       seg_indicator_timeout = setInterval(function(){
         var seg_left = 450*(html5_audios_playable[html5_current_idx].currentTime/time_to_sec(raw_data[html5_current_idx].duration));
-        $("#ind_"+raw_data[html5_current_idx].id).css("left",seg_left+"px"-3);
+        console.log(seg_left);
+        $("#ind_"+raw_data[html5_current_idx].id).css("left",seg_left+"px");
       },500);
     },300);
   });
@@ -207,7 +208,7 @@ function build_ui(){
       $(".seg_part").mousemove(function(e){
         current = e.pageX - left_edge;
         $("#gray_ind_"+raw_data[current_idx].id).css("display", "inline");
-        $("#gray_ind_"+raw_data[current_idx].id).css("left", current);
+        $("#gray_ind_"+raw_data[current_idx].id).css("left", current+"px");
       });
 
       $(".seg_part").mouseleave(function(e){
