@@ -21,6 +21,9 @@ var seg_indicator_timeout;
 var time_started;
 var time_ended;
 
+var mode2_current_left_px = -1;
+var bar_width = 450;
+
 
 // Support the newer Google Chrome only !
 function fire_up(){
@@ -51,6 +54,7 @@ function fire_up(){
 // enter a particular mode of our app
 function enter_mode(mode){
   play_mode = mode;
+  mode2_current_left_px = -1;
   if(play_mode == 1){
       if(typeof switch_buffer_player !== "undefined") switch_buffer_player.stop(0);
       pause_previous_html_audio();
@@ -162,15 +166,20 @@ function build_ui(){
     }
     var id_info = this.id.split("_");
     if(html5_current_segment_id == this.id){
-      pause_previous_html_audio();
+      // Don't pause track if in mode 2 and in same track (unless you click pause icon)
+      if(play_mode == 1 || (play_mode == 2 && (mode2_current_left_px && mode2_current_left_px <= 40))) {
+        pause_previous_html_audio();
+        $(".seg_part").removeClass("sel");
+        html5_current_segment_id = "";
+        return;
+      }
+    } else {
       $(".seg_part").removeClass("sel");
-      html5_current_segment_id = "";
-      return;
+      $(this).addClass("sel");
+      html5_current_segment_id = this.id;
+      pause_previous_html_audio();
     }
-    $(".seg_part").removeClass("sel");
-    $(this).addClass("sel");
-    html5_current_segment_id = this.id;
-    pause_previous_html_audio();
+    
     html5_current_idx = parseInt(id_info[0]);
     if(typeof html5_audios_load[html5_current_idx] === "undefined"){
       html5_audios_playable[html5_current_idx].load();
@@ -182,7 +191,14 @@ function build_ui(){
 
     setTimeout(function(){
       console.log(id_info);
-      html5_audios_playable[html5_current_idx].currentTime = parseInt(id_info[1]);
+
+      if(mode2_current_left_px != -1) {
+        var current_time_in_sec = (mode2_current_left_px/bar_width) * time_to_sec(raw_data[html5_current_idx].duration);
+
+        html5_audios_playable[html5_current_idx].currentTime = current_time_in_sec;
+      } else {
+        html5_audios_playable[html5_current_idx].currentTime = parseInt(id_info[1]);
+      }
       html5_audios_playable[html5_current_idx].play();
       clearInterval(seg_indicator_timeout);
       seg_indicator_timeout = setInterval(function(){
@@ -201,14 +217,11 @@ function build_ui(){
       var id_info = this.id.split("_");
       current_idx = parseInt(id_info[0]);
       var left_edge = $("#" + this.id).offset().left;
-      var right_edge = $("#" + this.id).offset().right;
-      var width = right_edge - left_edge;
-      var current;
 
       $(".seg_part").mousemove(function(e){
-        current = e.pageX - left_edge;
+        mode2_current_left_px = e.pageX - left_edge;
         $("#gray_ind_"+raw_data[current_idx].id).css("display", "inline");
-        $("#gray_ind_"+raw_data[current_idx].id).css("left", current+"px");
+        $("#gray_ind_"+raw_data[current_idx].id).css("left", mode2_current_left_px+"px");
       });
 
       $(".seg_part").mouseleave(function(e){
