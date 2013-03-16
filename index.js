@@ -190,8 +190,6 @@ function build_ui(){
     log_gen("sp", raw_data[html5_current_idx].id + "_" + id_info[1]);
 
     setTimeout(function(){
-      console.log(id_info);
-
       if(mode2_current_left_px != -1) {
         var current_time_in_sec = (mode2_current_left_px/bar_width) * time_to_sec(raw_data[html5_current_idx].duration);
 
@@ -203,7 +201,6 @@ function build_ui(){
       clearInterval(seg_indicator_timeout);
       seg_indicator_timeout = setInterval(function(){
         var seg_left = 450*(html5_audios_playable[html5_current_idx].currentTime/time_to_sec(raw_data[html5_current_idx].duration));
-        console.log(seg_left);
         $("#ind_"+raw_data[html5_current_idx].id).css("left",seg_left+"px");
       },500);
     },300);
