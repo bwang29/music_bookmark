@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+<link href='http://fonts.googleapis.com/css?family=Titillium+Web:300' rel='stylesheet' type='text/css'>
+<link href='index.css' rel='stylesheet' type='text/css'>
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script src='http://keith-wood.name/js/jquery.svg.js'></script>
+<script src="http://keith-wood.name/js/jquery.svgdom.js"></script>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="data.js"></script>
+<script>
+  function getQueryParams(qs) {
+    qs = qs.split("+").join(" ");
+    var params = {}, tokens,
+        re = /[?&]?([^=]+)=([^&]*)/g;
+    while (tokens = re.exec(qs)) {
+        params[decodeURIComponent(tokens[1])]
+            = decodeURIComponent(tokens[2]);
+    }
+    return params;
+  }
+</script>
+</head>
+
+<body>
+  <center>
+    <h1>Download Songs</h1>
+    <h3>Right click and select "Save Link As" to download each song</h3>
+    <div id="download"></div>
+  </center>
+
+  <script>
+    var data = getQueryParams(document.location.search).data;
+    if(data) {
+      var selected_songs = Base64.decode(data).split(",");
+      for(var i = 0; i < selected_songs.length; i++) {
+        var song_id = selected_songs[i].split("_")[1];
+        var song_url;
+        var song_title;
+        for(var j = 0; j < raw_data.length; j++) {
+          if(raw_data[j].id == song_id) {
+            song_url = raw_data[j].url;
+            song_title = raw_data[j].title;
+          }
+        }
+        $("#download").append("<a href='download/" + song_url + ".mp3'>Download Song - '" + song_title + "'</a><br>");
+      }
+    }
+  </script>
+</body>
+</html>

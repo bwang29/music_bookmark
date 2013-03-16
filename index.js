@@ -24,6 +24,8 @@ var time_ended;
 var mode2_current_left_px = -1;
 var bar_width = 450;
 
+var curr_selected_songs = [];
+
 
 // Support the newer Google Chrome only !
 function fire_up(){
@@ -101,7 +103,7 @@ function enter_mode(mode){
       $("#next_step").hide();
       l("Thanks for your participation!");
 
-      $("#music_seg").html("<div class='survey_code'><h2 style='margin-top:0'>Please copy the code below into the survey.</h2><div id='data_code' style='border:1px dashed; width:746px; padding:5px; margin:-10px 0 30px 0; background-color:#fafafa; font-size:75%; line-height:1;'>"+Base64.encode(JSON.stringify(log_data))+"</div></div><h2>Survey:</h2><div><iframe src=\"https://docs.google.com/forms/d/1ULt-fNqC37AtlaS_-d5_Opqp1cppuy5MCvYuqMjfFMM/viewform?embedded=true\" width=\"760\" height=\"1318\" frameborder=\"0\" marginheight=\"0\" marginwidth=\"0\">Loading...</iframe></div>");
+      $("#music_seg").html("<div class='survey_code'><h2 style='margin-top:0'>Please copy the code below into the survey.</h2><div id='data_code' style='border:1px dashed; width:746px; padding:5px; margin:-10px 0 30px 0; background-color:#fafafa; font-size:75%; line-height:1;'>"+Base64.encode(JSON.stringify(log_data))+"</div></div><h2>Download Songs:</h2><div><a href='download.html?data=" + gen_download_url() + "' target='_blank'>download link</a></div><h2>Survey:</h2><div><iframe src=\"https://docs.google.com/forms/d/1ULt-fNqC37AtlaS_-d5_Opqp1cppuy5MCvYuqMjfFMM/viewform?embedded=true\" width=\"760\" height=\"1318\" frameborder=\"0\" marginheight=\"0\" marginwidth=\"0\">Loading...</iframe></div>");
 
     }
 }
@@ -153,10 +155,15 @@ function build_ui(){
       total_song_checked += 1;
       // Log song checked. c: song checked
       log_gen("c",this.id);
+      if(curr_selected_songs.indexOf(this.id) == -1) {
+        curr_selected_songs.push(this.id);
+      }
     }else{
       // Log song unselected. uc: song unchecked
       total_song_checked -= 1;
       log_gen("uc",this.id);
+      var found_index = curr_selected_songs.indexOf(this.id);
+      curr_selected_songs.remove(found_index);
     }
   });
   // play music buffer when click
@@ -228,6 +235,11 @@ function build_ui(){
   }
 }
 
+function gen_download_url() {
+  var result = Base64.encode(curr_selected_songs.join());
+  return result;
+}
+
 // t: time, a: action, d: data, m: play mode
 function log_gen(act,d){
   log_data.push({
@@ -237,6 +249,13 @@ function log_gen(act,d){
     m:play_mode
   });
 }
+// remove from array
+Array.prototype.remove = function(from, to) {
+  var rest = this.slice((to || from) + 1 || this.length);
+  this.length = from < 0 ? this.length + from : from;
+  return this.push.apply(this, rest);
+};
+
 // show message to user
 function msg(str){$("#instruction").html(str); } 
 // pause the previous played audio
