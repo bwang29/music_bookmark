@@ -1,0 +1,144 @@
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="data.js"></script>
+
+<script>
+  var DATA_HEADER = "W3sidCI6IjIwMTMtMDMtMD";
+
+  var dataObjects = [];
+  var totalTime = [];
+  var mode = [];
+  var checkedSongs = [];
+  var modeOneCheckUnchecks = [];
+  var modeTwoCheckUnchecks = [];
+  var modeOnePreviews = [];
+  var modeTwoPreviews = [];
+  var chosenSongs = [];
+  var modeOneTimeSpent = [];
+  var modeTwoTimeSpent = [];
+  var modeOneSegmentsPlayed = [];
+  var modeTwoSegmentsPlayed = [];
+
+  function decode() {
+    data = $('#textData').val();
+
+    // Remove zero width spaces
+    //data = data.replace(/[\u200B-\u200D\uFEFF]/g, '');
+
+    // Decode data
+    while(data.length > 10) {
+      var nextIndex = data.substring(1).indexOf(DATA_HEADER);
+      if(nextIndex == -1) nextIndex = data.length - 1;
+      //console.log("This is nextIndex: " + nextIndex);
+      var dataEntry = data.substring(0, nextIndex);
+      data = data.substring(nextIndex + 1);
+      //console.log("This is new data: " + data);
+
+      var dataText = Base64.decode(dataEntry);
+
+      $('#result').html(dataText);
+      var dataObject = JSON.parse($('#result').html());
+      $('#result').html("");
+      //console.log(dataObject);
+      dataObjects.push(dataObject);
+
+      var numOfObjects = dataObject.length;
+      var tt = dataObject[numOfObjects-1].tt;
+      var m = dataObject[0].m;
+      totalTime.push(tt);
+      mode.push(m);
+
+
+      // Checks/unchecks
+      var modeOneCheckCount = 0;
+      var modeTwoCheckCount = 0;
+
+      // Segments played
+      var modeOneSegmentsPlayedCount = 0;
+      var modeTwoSegmentsPlayedCount = 0;
+
+      // Songs previewed
+      var modeOneSongsPlayed = [];
+      var modeTwoSongsPlayed = [];
+
+      var chosenSongIds = [];
+
+      // Get time spent in each section
+      var timeStarted = new Date(dataObject[0].t).getTime();
+      var timeSwitched = 0;
+
+      for (var i = 0; i < numOfObjects - 1; i++) {
+        var dataPoint = dataObject[i];
+
+        // Check count
+        if(dataPoint.a && (dataPoint.a == "c" || dataPoint.a == "uc")) {
+          if(dataPoint.m == "1") {
+            modeOneCheckCount++;
+          } else {
+            modeTwoCheckCount++;
+          }
+
+          // Chosen song
+          var songId = parseInt(dataPoint.d.substring(2));
+          // If song is checked, add to chosen list
+          if(dataPoint.a == "c") {
+            chosenSongIds.push(songId)
+          // If song is unchecked, remove from list
+          } else {
+            var index = chosenSongIds.indexOf(songId);
+            if(index != -1) {
+              chosenSongIds = chosenSongIds.splice(index, index);
+            }
+          }
+        }
+
+        // Songs previewed
+        if(dataPoint.a && dataPoint.a == "sp") {
+          var idInfo = dataPoint.d.split("_");
+          var songId = parseInt(idInfo[0]);
+
+          if(dataPoint.m == "1") {
+            modeOneSegmentsPlayedCount++;
+          } else if(dataPoint.m == "2") {
+            modeTwoSegmentsPlayedCount++;
+          }
+
+          if(dataPoint.m == "1" && modeOneSongsPlayed.indexOf(songId) == -1) {
+            modeOneSongsPlayed.push(songId);
+          } else if(dataPoint.m == "2" && modeTwoSongsPlayed.indexOf(songId) == -1) {
+            modeTwoSongsPlayed.push(songId);
+          }
+        }
+
+        // Time in first mode
+        if(dataPoint.m != m && timeSwitched == 0) {
+          timeSwitched = new Date(dataPoint.t).getTime();
+          modeOneTimeSpent.push(timeSwitched - timeStarted);
+          modeTwoTimeSpent.push(tt - (timeSwitched - timeStarted));
+        }
+      }
+
+      modeOneCheckUnchecks.push(modeOneCheckCount);
+      modeTwoCheckUnchecks.push(modeTwoCheckCount);
+      modeOnePreviews.push(modeOneSongsPlayed.length);
+      modeTwoPreviews.push(modeTwoSongsPlayed.length);
+      chosenSongs.push(chosenSongIds.join());
+      modeOneSegmentsPlayed.push(modeOneSegmentsPlayedCount);
+      modeTwoSegmentsPlayed.push(modeTwoSegmentsPlayedCount);
+    }
+
+    console.log(dataObjects);
+    console.log(totalTime);
+
+    for(var i = 0; i < totalTime.length; i++) {
+      $('#data').append("<tr><td>" + i + "</td><td>" + totalTime[i] + "</td><td>" + mode[i] + "</td><td>" + modeOneCheckUnchecks[i] + "</td><td>" + modeTwoCheckUnchecks[i] + "</td><td>" + modeOnePreviews[i] + "</td><td>" + modeTwoPreviews[i] + "</td><td>" + chosenSongs[i] + "</td><td>" + modeOneTimeSpent[i] + "</td><td>" + modeTwoTimeSpent[i] + "</td><td>" + modeOneSegmentsPlayed[i] + "</td><td>" + modeTwoSegmentsPlayed[i] + "</td></tr>");
+    }
+  }
+</script>
+
+<form action="#" onsubmit="decode(); return false;">
+<textarea id="textData" style="width:100%; height:50%;"></textarea>
+<input type="submit" />
+</form>
+
+<div id="result"></div>
+<table border="1" id="data"><tr><td>User</td><td>Total Time Spent</td><td>Mode</td><td>Mode 1 Checks/Unchecks</td><td>Mode 2 Checks/Unchecks</td><td>Mode 1 Previews</td><td>Mode 2 Previews</td><td>Chosen Songs</td><td>Mode 1 Time Spent</td><td>Mode 2 Time Spent</td><td>Mode 1 Segments Played</td><td>Mode 2 Segments Played</td></tr></div>

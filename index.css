@@ -146,3 +146,11 @@ input[type=checkbox]{
 	background: #CC0000;
 }
 
+.seg_indicator_gray{
+  position: absolute;
+  height: 40px;
+  width: 3px;
+  background: #333333;
+  display: none;
+}
+

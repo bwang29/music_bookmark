@@ -21,6 +21,11 @@ var seg_indicator_timeout;
 var time_started;
 var time_ended;
 
+var mode2_current_left_px = -1;
+var bar_width = 450;
+
+var curr_selected_songs = [];
+
 
 // Support the newer Google Chrome only !
 function fire_up(){
@@ -51,6 +56,7 @@ function fire_up(){
 // enter a particular mode of our app
 function enter_mode(mode){
   play_mode = mode;
+  mode2_current_left_px = -1;
   if(play_mode == 1){
       if(typeof switch_buffer_player !== "undefined") switch_buffer_player.stop(0);
       pause_previous_html_audio();
@@ -97,7 +103,7 @@ function enter_mode(mode){
       $("#next_step").hide();
       l("Thanks for your participation!");
 
-      $("#music_seg").html("<div class='survey_code'><h2 style='margin-top:0'>Please copy the code below into the survey.</h2><div id='data_code' style='border:1px dashed; width:746px; padding:5px; margin:-10px 0 30px 0; background-color:#fafafa; font-size:75%; line-height:1;'>"+Base64.encode(JSON.stringify(log_data))+"</div></div><h2>Survey:</h2><div><iframe src=\"https://docs.google.com/forms/d/1ULt-fNqC37AtlaS_-d5_Opqp1cppuy5MCvYuqMjfFMM/viewform?embedded=true\" width=\"760\" height=\"1318\" frameborder=\"0\" marginheight=\"0\" marginwidth=\"0\">Loading...</iframe></div>");
+      $("#music_seg").html("<div class='survey_code'><h2 style='margin-top:0'>Please copy the code below into the survey.</h2><div id='data_code' style='border:1px dashed; width:746px; padding:5px; margin:-10px 0 30px 0; background-color:#fafafa; font-size:75%; line-height:1;'>"+Base64.encode(JSON.stringify(log_data))+"</div></div><h2>Download Songs:</h2><div><a href='download.html?data=" + gen_download_url() + "' target='_blank'>download link</a></div><h2>Survey:</h2><div><iframe src=\"https://docs.google.com/forms/d/1ULt-fNqC37AtlaS_-d5_Opqp1cppuy5MCvYuqMjfFMM/viewform?embedded=true\" width=\"760\" height=\"1318\" frameborder=\"0\" marginheight=\"0\" marginwidth=\"0\">Loading...</iframe></div>");
 
     }
 }
@@ -113,7 +119,7 @@ function build_ui(){
     if(s < raw_data.length/2){
       var seg_html = "<div class='seg_bar mode1'><div class='sound_title'>"+raw_data[s].title.split(".mp3")[0]+"</div><div class='seg_indicator' id='ind_"+sid+"'></div>";
     }else{
-      var seg_html = "<div class='seg_bar mode2'><div class='sound_title'>"+raw_data[s].title.split(".mp3")[0]+"</div><div class='seg_indicator' id='ind_"+sid+"'></div>";
+      var seg_html = "<div class='seg_bar mode2'><div class='sound_title'>"+raw_data[s].title.split(".mp3")[0]+"</div><div class='seg_indicator' id='ind_"+sid+"'></div><div class='seg_indicator_gray' id='gray_ind_"+sid+"'></div>";
     }
    
     var pt = 0; // start time of a segment
@@ -149,10 +155,15 @@ function build_ui(){
       total_song_checked += 1;
       // Log song checked. c: song checked
       log_gen("c",this.id);
+      if(curr_selected_songs.indexOf(this.id) == -1) {
+        curr_selected_songs.push(this.id);
+      }
     }else{
       // Log song unselected. uc: song unchecked
       total_song_checked -= 1;
       log_gen("uc",this.id);
+      var found_index = curr_selected_songs.indexOf(this.id);
+      curr_selected_songs.remove(found_index);
     }
   });
   // play music buffer when click
@@ -162,15 +173,20 @@ function build_ui(){
     }
     var id_info = this.id.split("_");
     if(html5_current_segment_id == this.id){
-      pause_previous_html_audio();
+      // Don't pause track if in mode 2 and in same track (unless you click pause icon)
+      if(play_mode == 1 || (play_mode == 2 && (mode2_current_left_px && mode2_current_left_px <= 40))) {
+        pause_previous_html_audio();
+        $(".seg_part").removeClass("sel");
+        html5_current_segment_id = "";
+        return;
+      }
+    } else {
       $(".seg_part").removeClass("sel");
-      html5_current_segment_id = "";
-      return;
+      $(this).addClass("sel");
+      html5_current_segment_id = this.id;
+      pause_previous_html_audio();
     }
-    $(".seg_part").removeClass("sel");
-    $(this).addClass("sel");
-    html5_current_segment_id = this.id;
-    pause_previous_html_audio();
+    
     html5_current_idx = parseInt(id_info[0]);
     if(typeof html5_audios_load[html5_current_idx] === "undefined"){
       html5_audios_playable[html5_current_idx].load();
@@ -181,17 +197,47 @@ function build_ui(){
     log_gen("sp", raw_data[html5_current_idx].id + "_" + id_info[1]);
 
     setTimeout(function(){
-      console.log(id_info);
-      html5_audios_playable[html5_current_idx].currentTime = parseInt(id_info[1]);
+      if(mode2_current_left_px != -1) {
+        var current_time_in_sec = (mode2_current_left_px/bar_width) * time_to_sec(raw_data[html5_current_idx].duration);
+
+        html5_audios_playable[html5_current_idx].currentTime = current_time_in_sec;
+      } else {
+        html5_audios_playable[html5_current_idx].currentTime = parseInt(id_info[1]);
+      }
       html5_audios_playable[html5_current_idx].play();
       clearInterval(seg_indicator_timeout);
       seg_indicator_timeout = setInterval(function(){
         var seg_left = 450*(html5_audios_playable[html5_current_idx].currentTime/time_to_sec(raw_data[html5_current_idx].duration));
         $("#ind_"+raw_data[html5_current_idx].id).css("left",seg_left+"px");
-      },1000);
+      },500);
     },300);
   });
 
+  var current_idx;
+
+  // shift segment indicator when hovering over gray segments in play_mode 2
+  if(play_mode == 2) {
+    $(".seg_part").mouseenter(function(e) {
+      var id_info = this.id.split("_");
+      current_idx = parseInt(id_info[0]);
+      var left_edge = $("#" + this.id).offset().left;
+
+      $(".seg_part").mousemove(function(e){
+        mode2_current_left_px = e.pageX - left_edge;
+        $("#gray_ind_"+raw_data[current_idx].id).css("display", "inline");
+        $("#gray_ind_"+raw_data[current_idx].id).css("left", mode2_current_left_px+"px");
+      });
+
+      $(".seg_part").mouseleave(function(e){
+        $("#gray_ind_"+raw_data[current_idx].id).css("display", "none");
+      });
+    });
+  }
+}
+
+function gen_download_url() {
+  var result = Base64.encode(curr_selected_songs.join());
+  return result;
 }
 
 // t: time, a: action, d: data, m: play mode
@@ -203,6 +249,13 @@ function log_gen(act,d){
     m:play_mode
   });
 }
+// remove from array
+Array.prototype.remove = function(from, to) {
+  var rest = this.slice((to || from) + 1 || this.length);
+  this.length = from < 0 ? this.length + from : from;
+  return this.push.apply(this, rest);
+};
+
 // show message to user
 function msg(str){$("#instruction").html(str); } 
 // pause the previous played audio
