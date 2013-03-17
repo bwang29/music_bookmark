@@ -44,7 +44,7 @@ function fire_up(){
       audio.preload = "none";
       var audio_wrapper = document.createElement("div");
       audio_wrapper.setAttribute("class","audio_wrapper");
-      audio_wrapper.setAttribute("style","display:none; width: 350px; margin: 0 auto;")
+      audio_wrapper.setAttribute("style","display:none;width: 350px; margin: 0 auto;")
       audio_wrapper.appendChild(audio);
       document.body.appendChild(audio_wrapper); 
       html5_audios_playable.push(audio);
@@ -56,12 +56,13 @@ function fire_up(){
 
 
 function iterative_loading(){
-  html5_audios_playable[iterative_loading_ctr].load();
-  setInterval(function(){
-    if(iterative_loading_ctr == 29) return;
-    iterative_loading_ctr += 1;
-    html5_audios_playable[iterative_loading_ctr].load();
-  },8000);
+  //somehow this causes problem
+  // html5_audios_playable[iterative_loading_ctr].load();
+  // setInterval(function(){
+  //   if(iterative_loading_ctr == 29) return;
+  //   iterative_loading_ctr += 1;
+  //   html5_audios_playable[iterative_loading_ctr].load();
+  // },8000);
 }
 
 // enter a particular mode of our app
@@ -132,9 +133,9 @@ function build_ui(){
     var d = time_to_sec(raw_data[s].duration);
 
     if(s < raw_data.length/2){
-      var seg_html = "<div class='seg_bar mode1'><div class='sound_title'>"+raw_data[s].title.split(".mp3")[0]+"</div><div class='seg_indicator' id='ind_"+sid+"'></div>";
+      var seg_html = "<div class='seg_bar mode1'><div class='sound_title'>"+raw_data[s].title.split(".mp3")[0].replace(/\+/g," ")+"</div><div class='seg_indicator' id='ind_"+sid+"'></div>";
     }else{
-      var seg_html = "<div class='seg_bar mode2'><div class='sound_title'>"+raw_data[s].title.split(".mp3")[0]+"</div><div class='seg_indicator' id='ind_"+sid+"'></div><div class='seg_indicator_gray' id='gray_ind_"+sid+"'></div>";
+      var seg_html = "<div class='seg_bar mode2'><div class='sound_title'>"+raw_data[s].title.split(".mp3")[0].replace(/\+/g," ")+"</div><div class='seg_indicator' id='ind_"+sid+"'></div><div class='seg_indicator_gray' id='gray_ind_"+sid+"'></div>";
     }
    
     var pt = 0; // start time of a segment

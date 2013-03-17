@@ -170,9 +170,9 @@ url: "EWaZ2",
 id: 29}
 ];
 // for aws S3 we need to replace space by plus
-for(var i=0; i<raw_data.length; i++){
-  raw_data[i].title = raw_data[i].title.replace(/ /g, '+');
-}
+// for(var i=0; i<raw_data.length; i++){
+//   raw_data[i].title = encodeURIComponent(raw_data[i].title.replace(/ /g, '+'));
+// }
 fisherYates(raw_data);
 
 
