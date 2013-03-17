@@ -62,8 +62,13 @@ function enter_mode(mode){
       pause_previous_html_audio();
       loading_progress = 0;
       total_song_checked = 0;
-      msg("Welcome to the Calming Tech Music Store!");
-      l("Click on the color segments to preview parts of songs. Please use the check-boxes to select up to five songs that you want to purchase. Once you're done, click 'Go to the next step'.");
+      msg("Calming Tech Music Store");
+      var color_map = "<div><br>Color illustration<br>";
+      for(var i=0; i<7;i++){
+        color_map+= "<div class='seg_ilu' style='border-radius:3px; font-size:13px; width:55px; color:#292929;display:inline-block; margin:3px; background:"+sample_color_map[i]+"'>"+sample_color_map[i+"_n"]+" </div>";
+      }
+      color_map+="</div>";
+      l("Click on the color segments to preview parts of songs. Please use the check-boxes to select up to five songs that you want to purchase. Once you're done, click 'Go to the next step'."+color_map);
       $("#next_step").show();
       build_ui();
       $(".mode1").show();
@@ -80,7 +85,7 @@ function enter_mode(mode){
       pause_previous_html_audio();
       loading_progress = 0;
       total_song_checked = 0;
-      msg("Welcome to the Calming Tech Music Store");
+      msg("Calming Tech Music Store");
       l("Click on each strip to preview that song. Please select up to 5 songs using the check-boxes you want to purchase. Once you're done, click 'Go to the next step'.");
       $("#next_step").show().html("Go to the next step");
       build_ui();
@@ -102,7 +107,6 @@ function enter_mode(mode){
       pause_previous_html_audio();
       $("#next_step").hide();
       l("Thanks for your participation!");
-
       $("#music_seg").html("<div class='survey_code'><h2 style='margin-top:0'>Please copy the code below into the survey.</h2><div id='data_code' style='border:1px dashed; width:746px; padding:5px; margin:-10px 0 30px 0; background-color:#fafafa; font-size:75%; line-height:1;'>"+Base64.encode(JSON.stringify(log_data))+"</div></div><h2>Download Songs:</h2><div><a href='download.html?data=" + gen_download_url() + "' target='_blank'>download link</a></div><h2>Survey:</h2><div><iframe src=\"https://docs.google.com/forms/d/1ULt-fNqC37AtlaS_-d5_Opqp1cppuy5MCvYuqMjfFMM/viewform?embedded=true\" width=\"760\" height=\"1318\" frameborder=\"0\" marginheight=\"0\" marginwidth=\"0\">Loading...</iframe></div>");
 
     }
@@ -136,7 +140,7 @@ function build_ui(){
       }
       seg_html += "<div class='seg_part' id='"+s+"_"+pt+"' style='width:"+100*((d - pt)/d)+"%;background-color:"+sample_color_map[segs[segs.length-1].split("_")[1]]+"'></div>";
     }else if(play_mode == 2){
-      seg_html += "<div class='seg_part' id='"+s+"_"+pt+"' style='width:100%;background-color:#999'></div>";
+      seg_html += "<div class='seg_part' id='"+s+"_"+pt+"' style='width:100%;background-color:#AAA'></div>";
     }
     // append checkboxes
     seg_html += '<input type="checkbox" class="ckbox" id="c_'+sid+'" value="'+raw_data[s].title.split(".")[0]+'"><br>';

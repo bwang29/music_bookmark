@@ -4,10 +4,17 @@ var sample_color_map = {
   0:"#F5EDF4",
   1:"#C6BAD5",
   2:"#8F8DB4",
-  3:"#A39ABC",
+  3:"#92BEB6",
   4:"#BCDD7F",
-  5:"#6A4061",
-  6:"#65C9FF"
+  5:"#A76297",
+  6:"#65C9FF",
+  "0_n": "Intro",
+  "1_n": "Verse",
+  "2_n": "Chorus",
+  "3_n": "Bridge",
+  "4_n": "Tension",
+  "5_n": "Solo",
+  "6_n": "Ending"
 };
 
 var raw_data = [
@@ -405,10 +412,6 @@ function makeid(){
         text += possible.charAt(Math.floor(Math.random() * possible.length));
 
     return text;
-}
-
-for(var i=0; i< raw_data.length; i++){
-  console.log(Base64.encode(makeid()+"/"+raw_data[i].title));
 }
 
 

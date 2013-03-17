@@ -1,9 +1,11 @@
 body{
 	font-family: "Titillium Web";
 	margin:0;
+	background: #292929;
+	color: #fafafa;
 }
 h2{
-	font-size: 36px;
+	font-size: 28px;
 }
 .outer-center {
 	margin-top: 30px;
@@ -32,10 +34,10 @@ h2{
 }
 a{
 	text-decoration: none;
-	color: #445566;
+	color: #778899;
 }
 a:hover{
-	color: #223344;
+	color: #99AABB;
 }
 .hide{
 	display: none;
@@ -86,9 +88,10 @@ a:hover{
 	opacity: 0.9;
 }
 .survey_code{
-	width: 500px;
 	word-wrap: break-word;
-
+}
+#data_code{
+	color: #292929;
 }
 input[type=checkbox]{
   /* Double-sized Checkboxes */
@@ -117,7 +120,7 @@ input[type=checkbox]{
 	margin-top:6px;
 	line-height: 18px;
 	margin-bottom: 2px;
-	color: #333;
+	color: #CCC;
 	font-size: 14px;
 }
 .ckbox{
@@ -150,7 +153,7 @@ input[type=checkbox]{
   position: absolute;
   height: 40px;
   width: 3px;
-  background: #333333;
+  background: #CC0000;
   display: none;
 }
 
