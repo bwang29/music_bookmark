@@ -43,7 +43,7 @@
             song_title = raw_data[j].title;
           }
         }
-        $("#download").append("<a href='download/" + song_url + ".mp3'>Download Song - '" + song_title + "'</a><br>");
+        $("#download").append("<a href='https://s3.amazonaws.com/tourfy_mount_001/music/" + song_url + ".mp3'>Download Song - '" + song_title + "'</a><br>");
       }
     }
   </script>
