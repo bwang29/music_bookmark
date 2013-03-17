@@ -20,7 +20,7 @@ $(document).ready(function(){
 var seg_indicator_timeout;
 var time_started;
 var time_ended;
-
+var iterative_loading_ctr = 0;
 var mode2_current_left_px = -1;
 var bar_width = 450;
 
@@ -44,13 +44,24 @@ function fire_up(){
       audio.preload = "none";
       var audio_wrapper = document.createElement("div");
       audio_wrapper.setAttribute("class","audio_wrapper");
-      audio_wrapper.setAttribute("style","display:none; width: 350px; margin: 0 auto;")
+      audio_wrapper.setAttribute("style"," width: 350px; margin: 0 auto;")
       audio_wrapper.appendChild(audio);
       document.body.appendChild(audio_wrapper); 
       html5_audios_playable.push(audio);
     }
+    iterative_loading();
     enter_mode(first_mode);
     time_started = new Date().getTime();
+}
+
+
+function iterative_loading(){
+  html5_audios_playable[iterative_loading_ctr].load();
+  setInterval(function(){
+    if(iterative_loading_ctr == 29) return;
+    iterative_loading_ctr += 1;
+    html5_audios_playable[iterative_loading_ctr].load();
+  },8000);
 }
 
 // enter a particular mode of our app
