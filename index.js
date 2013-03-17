@@ -23,7 +23,7 @@ var time_ended;
 var iterative_loading_ctr = 0;
 var mode2_current_left_px = -1;
 var bar_width = 450;
-
+var color_by_energy = parseInt(getQueryParams(document.location.search).seg_type);  // seg_type = 1 means color by energy
 var curr_selected_songs = [];
 
 
@@ -33,6 +33,12 @@ function fire_up(){
     if(!isChrome) {
       window.alert("Please use the latest version of Chrome. We don't support other browsers at the moment, sorry!");
       return;
+    }
+
+    if(color_by_energy){
+      log_data.push({seg_type:"energy"});
+    }else{
+      log_data.push({seg_type:"logical"});
     }
 
     console.log("Audio context initiated");
@@ -76,8 +82,14 @@ function enter_mode(mode){
       total_song_checked = 0;
       msg("Calming Tech Music Store");
       var color_map = "<div><br>Color illustration<br>";
-      for(var i=0; i<7;i++){
-        color_map+= "<div class='seg_ilu' style='border-radius:3px; font-size:13px; width:55px; color:#292929;display:inline-block; margin:3px; background:"+sample_color_map[i]+"'>"+sample_color_map[i+"_n"]+" </div>";
+      if(!color_by_energy){
+        for(var i=0; i<sample_color_map.length;i++){
+            color_map+= "<div class='seg_ilu' style='border-radius:3px; font-size:13px; width:55px; color:#292929;display:inline-block; margin:3px; background:"+sample_color_map[i]+"'>"+sample_color_map[i+"_n"]+" </div>";
+        }
+      }else{
+        for(var i=0; i<sample_color_map2.length;i++){
+            color_map+= "<div class='seg_ilu' style='border-radius:3px; font-size:13px; width:80px; color:#292929;display:inline-block; margin:3px; background:"+sample_color_map2[i]+"'>"+sample_color_map2[i+"_n"]+" </div>";
+        }
       }
       color_map+="</div>";
       l("Click on the color segments to preview parts of songs. Please use the check-boxes to select up to five songs that you want to purchase. Once you're done, click 'Go to the next step'."+color_map);
@@ -129,7 +141,11 @@ function build_ui(){
   $("#music_seg").empty();
   for(var s=0; s<raw_data.length;s++){
     var sid = raw_data[s].id;
-    var segs = raw_data[s].segment.split(" ");
+    if(!color_by_energy){
+      var segs = raw_data[s].segment.split(" ");
+    }else{
+      var segs = raw_data[s].segment2.split(" ");
+    }
     var d = time_to_sec(raw_data[s].duration);
 
     if(s < raw_data.length/2){
@@ -142,15 +158,24 @@ function build_ui(){
     var c_p = 0; // type of a segment
     // mode 1 is segmented
     if(play_mode == 1){
-      for(var i=0; i<segs.length; i++){
-        var c_t = time_to_sec(segs[i].split("_")[0])+1; // end time of a segment, increase 1 to fit
-        if(i != 0){
-          c_p = segs[i-1].split("_")[1];
+      if(!color_by_energy){
+        for(var i=0; i<segs.length; i++){
+          var c_t = time_to_sec(segs[i].split("_")[0])+1; // end time of a segment, increase 1 to fit
+          if(i != 0){
+            c_p = segs[i-1].split("_")[1];
+          }
+          seg_html += "<div class='seg_part' id='"+s+"_"+pt+"' style='width:"+100*((c_t - pt)/d)+"%;background-color:"+sample_color_map[c_p]+"'></div>";
+          pt = c_t;
         }
-        seg_html += "<div class='seg_part' id='"+s+"_"+pt+"' style='width:"+100*((c_t - pt)/d)+"%;background-color:"+sample_color_map[c_p]+"'></div>";
-        pt = c_t;
+        seg_html += "<div class='seg_part' id='"+s+"_"+pt+"' style='width:"+100*((d - pt)/d)+"%;background-color:"+sample_color_map[segs[segs.length-1].split("_")[1]]+"'></div>";
+      }else{
+        for(var i=0; i<segs.length; i++){
+          var c_t = time_to_sec(segs[i].split("_")[1])+1; // end time of a segment, increase 1 to fit
+          c_p = segs[i].split("_")[0];
+          seg_html += "<div class='seg_part' id='"+s+"_"+pt+"' style='width:"+99*((c_t - pt)/d)+"%;background-color:"+sample_color_map2[c_p]+"'></div>";
+          pt = c_t;
+        }
       }
-      seg_html += "<div class='seg_part' id='"+s+"_"+pt+"' style='width:"+100*((d - pt)/d)+"%;background-color:"+sample_color_map[segs[segs.length-1].split("_")[1]]+"'></div>";
     }else if(play_mode == 2){
       seg_html += "<div class='seg_part' id='"+s+"_"+pt+"' style='width:100%;background-color:#AAA'></div>";
     }
