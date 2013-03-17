@@ -44,7 +44,7 @@ function fire_up(){
       audio.preload = "none";
       var audio_wrapper = document.createElement("div");
       audio_wrapper.setAttribute("class","audio_wrapper");
-      audio_wrapper.setAttribute("style"," width: 350px; margin: 0 auto;")
+      audio_wrapper.setAttribute("style","display:none; width: 350px; margin: 0 auto;")
       audio_wrapper.appendChild(audio);
       document.body.appendChild(audio_wrapper); 
       html5_audios_playable.push(audio);
