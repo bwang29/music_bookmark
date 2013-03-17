@@ -169,6 +169,10 @@ segment: "1:06_1 1:36_2 2:09_5 2:37_2 2:56_0 3:00_1 3:30_2 4:14_5 5:00_6",
 url: "EWaZ2",
 id: 29}
 ];
+// for aws S3 we need to replace space by plus
+for(var i=0; i<raw_data.length; i++){
+  raw_data[i].title = raw_data[i].title.replace(/ /g, '+');
+}
 fisherYates(raw_data);
 
 
